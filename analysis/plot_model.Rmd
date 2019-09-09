@@ -312,7 +312,7 @@ find_percent_extinct <- function(variable, dataset, number_of_bins){
   } else {
     dataset <- dataset %>% group_by(value) 
   }
-  
+   
   output <- dataset %>%
     summarise(n_extinct = sum(went_extinct == 1),
               n_runs = n(),

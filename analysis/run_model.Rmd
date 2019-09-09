@@ -6,7 +6,7 @@ editor_options:
   chunk_output_type: console
 ---
   
-## Load functions from `analysis/model_functions.Rmd`
+## Load functions from `analysis/model_functions.Rmd` 
   
 ```{r results='hide', eval=FALSE}
 source_rmd <- function(file){
