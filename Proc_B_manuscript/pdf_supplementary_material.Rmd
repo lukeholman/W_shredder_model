@@ -1,0 +1,139 @@
+---
+title: "Supplementary Material"
+subtitle: "From: Holman 2019, _Evolutionary simulations of _Z_-linked suppression gene drives_"
+output: pdf_document
+bibliography: references.bib
+csl: procB.csl
+header-includes: 
+  \usepackage{booktabs}
+  \usepackage{microtype}
+  \usepackage{longtable}
+  \usepackage[margin=1in]{geometry}
+  \usepackage{float}
+---
+
+\newcommand{\beginsupplement}{
+        \setcounter{table}{0}
+        \renewcommand{\thetable}{S\arabic{table}}
+        \setcounter{figure}{0}
+        \renewcommand{\thefigure}{S\arabic{figure}}
+     }
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(kableExtra)
+library(stringr)
+library(grid)
+
+make_table <- function(file, LT = TRUE, digits = getOption("digits"), math_mode = FALSE){
+  tabl <- readRDS(file)
+  tabl[,2] <- prettyNum(tabl[,2], big.mark = ",", scientific = FALSE)
+  
+  if(!math_mode){
+    kable(tabl, "latex", longtable = LT, booktabs = TRUE, digits = digits) %>%
+      kable_styling(latex_options = c("repeat_header", "scale_down"), font_size = 7)
+  } else {
+    kable(tabl, "latex", longtable = LT, booktabs = TRUE, digits = digits, escape = FALSE, table.envir = "array*") %>%
+      kable_styling(latex_options = c("repeat_header", "scale_down"), font_size = 7)
+  }
+}
+
+n_runs <- readRDS("../data/number_of_runs.rds")
+```
+
+The R scripts used to run the model and generate all figures and tables can be viewed at **[https://lukeholman.github.io/W_shredder/]()**, along with annotations explaining the code.
+
+# Supplementary Methods
+
+## Gamete production and gene drive
+
+I assume that the _A/a_ and _B/b_ loci segregate independently during meiosis and display standard Mendelian inheritance. Inheritance of the sex chromosomes is also Mendelian except for certain genotypes carrying one _Z\*_ allele. 
+
+Firstly, _Z\*_$W^+$_aaBB_, _Z\*_$W^+$_aaBb_, and _Z\*_$W^+$_aabb_ females produce a fraction $\frac{1}{2}(1 + p_{shred})$ of _Z_-bearing gametes and $\frac{1}{2}(1 - p_{shred})$ _W_-bearing gametes. Therefore, these three female genotypes produce >50% sons when $p_{shred} > 0$, due to the shortage of _W_ chromosomes in their gametes. The gamete frequencies of resistant female genotypes -- i.e. genotypes that include a $W^r$ chromosome and/or at least one _A_ allele -- conform to the standard Mendelian expectation.
+
+Secondly, _Z\*_$Z^+$_AAbb_, _Z\*_$Z^+$_Aabb_, and _Z\*_$Z^+$_aabb_ males produce a fraction $\frac{1}{2}(1 + p_{conv} - p_{conv} p_{nhej})$ of gametes carrying the _Z\*_ allele, $\frac{1}{2}(1 - p_{conv})$ gametes carrying the $Z^+$ allele, and $\frac{1}{2}(p_{conv} p_{nhej}))$ gametes carrying the $Z^r$ allele. Thus, gene conversion occurs in males if $p_{conv} > 0$, meaning that the _Z\*_ allele is over-represented in the gametes of these three male genotypes. The parameter $p_{nhej}$ represents the creation of resistance alleles via non-homologous end joining, in which the gene drive fails to copy itself to the homologous chromosome, and instead induces an indel mutation that creates a resistant allele. The gamete frequencies of _Z\*_$Z^r$ males, or of males carrying at least one _B_ allele, conform to the standard Mendelian expectations due to resistance.
+
+
+## Calculating female fecundity
+Females with no _Z\*_ alleles have an intrinsic quality or 'fitness' of $w$ = 1, while the fitness of females carrying _Z\*_ is $1 - c_f$. Small $c_f$ implies minimal costs of _Z\*_ to offspring production (e.g. because mothers replace lost gametes/offspring and/or sib-sib competition is intense), $c_f = 0.5$ could represent the case where all daughters die and are not replaced, and $c_f = 1$ means that females carrying _Z\*_ are completely sterile. Setting $c_f = 1$ allows simulation of a female-sterilising _Z_-linked drive (Figure 1D).
+
+In the breeding phase of the lifecycle, the simulation first determines the number of offspring produced by each female. The expected fecundity of female $i$ ($F_i$) is affected by three factors: the female's genotype, the density of males and females in the local patch and/or in the full population, and some global parameters in the model, as follows:
+
+\begin{equation}
+F_i = w_i \big(2 + r(1 - (D_i / K) ^ \alpha)\big)
+\end{equation}
+
+where $D_i$ is the 'density' experienced by female $i$, $w_i$ is her fitness, $K$ is the carrying capacity, $r$ controls the maximum possible fecundity, and $\alpha$ determines the shape of density-dependence [function adapted from @fowler1981de]. The function means that female fecundity declines to a maximum of two offspring as $D_i$ approaches $K$, and that females with $w_i=0$ produce no offspring. When $D_i > K$, we set $D_i = K$, preventing fecundity from going below $F_i = 2w_i$.
+
+To ensure that the simulation captures various possible types of life history and ecology, I calculated density $D_i$ in various ways in different simulation runs. First, I define the global density $d_g$, which acts equally on every female in every patch, as 
+
+\begin{equation}
+d_g = \sum_{i=1}^{N_f} w_i + \delta N_m
+\end{equation}
+
+where $N_f$ and $N_m$ are the numbers of females and males across all patches, the first term is the summed fitnesses of all these females, and $\delta$ is a constant (range: $0-\infty$) that scales the effect of each male on $d_g$ relative to a female with fitness $w_i = 1$. This formulation means that females with high relative fitness (and thus higher fecundity) have a stronger effect on the global density than do low-fitness females. I also assume that each male contributes a fixed amount to the global density, irrespective of his genotype/fitness (since I assume that male fitness only affects male mating success; see below). The parameter $\delta$ represents sex differences in ecological niche use and behaviour. For example, one might expect $\delta<1$ in species where males and females utilise very different environmental niches, or $\delta>1$ in species where males are harmful to females.
+
+Second, I define the local density $d_j$ experienced by every female in patch $j$, as 
+
+\begin{equation}
+d_j = \sum_{i=1}^{n_{f,j}} w_i + \delta n_{m,j}
+\end{equation}
+
+where $n_{f,j}$ and $n_{m,j}$ are the numbers of females and males in patch $j$. As before, this formulation means that $d_j$ depends on the summed fitnesses of the females in the patch, as well as the number of males (scaled by the constant $\delta$).
+
+Finally, the overall density experienced by female $i$ in patch $j$ ($D_i$) is a weighted sum of the global and local densities given by $D_i = \psi d_g + (1 - \psi)d_j$, where the parameter $\psi$ weights the importance of global and local density to female fecundity. When $\psi = 0$, only local density matters and selection on females is entirely 'soft', while when $\psi = 1$ only global density matters and selection on females is completely 'hard' [as in @li2018ev]. Intermediate values of $\psi$ produce a mixture of hard and soft selection on females.
+
+After calculating the _expected_ fecundity of each female ($F_i$), the simulation generates each feamle's _realised_ fecundity by randomly drawing an integer from a Poisson distribution with $\lambda = F_i$; this allows fecundity to vary stochastically between females with equal $F_i$. If the resulting number of offspring exceeded the global carrying capacity $K$, the model randomly selects $K$ surviving offspring. 
+
+
+## Competition between males
+Similarly to females, I assume that males have intrinsic fitness determined by their genotype, except that male fitness determines mating success (see below) rather than fecundity. The fitness of males carrying _Z\*_ is reduced by a factor $1 - c_m$. For simplicity, the costs of _Z\*_ to males were assumed to be dominant, such that _Z\*_$Z^+$ males and _Z\*Z\*_ males had equal fitness.
+
+After determining how many offspring each female produces, we determine the fathers of each of these offspring. We assume that all breeding occurs within patches, such that males only compete for matings/fertilisations with males in the same patch. If the patch contains $l$ different male genotypes and there are $n_1, n_2, ... n_l$ males of each genotype, the probability that a male of the $l$^th^ genotype is the father of any given offspring is 
+
+\begin{equation}
+p_l = \frac{n_{l}w_l}{\sum_{i=1}^{l}n_{i}w_i}
+\end{equation}
+
+such that relatively common and/or high-fitness male genotypes are more likely to sire offspring. This formulation means that both sexes potentially reproduce with multiple partners.
+
+## Reproduction, mutation and dispersal
+
+After picking the parents, the model randomly generates each offspring's genotype according to its parents' expected gamete (and thus zygote) frequencies. Offspring are born in the same patch as their parents, and the parental generation is replaced by the offspring generation.
+
+When an offspring is created, each $Z^+$ allele it carries has a chance $\mu_Z$ to mutate to a $Z^r$ allele, and _vice versa_ (i.e. mutation in both directions is equally probable). Similarly, each $W^+$ allele has a chance $\mu_W$ to mutate to a $W^r$ allele, and _vice versa_. 
+
+Female and male offspring disperse to another patch with probabilities $x_f$ and $x_m$ respectively. We model two types of dispersal, in separate simulations: local dispersal, in which offspring move to one of the two neighbouring patches with equal probability (recalling that the patches are arranged in a ring), or global dispersal, in which dispersing offspring can land in any of the other patches.
+
+## One compete run of the simulation
+
+The simulation first initialises a population of 10,000 individuals (the carrying capacity, $K$) with low or zero frequencies of $Z^r$, $W^r$, _A_ and _B_ alleles, higher frequencies of the wild type $Z^+$, _W+_, _a_, and _b_ alleles, and zero _Z\*_ gene drive alleles. The simulation then runs 50 generations as 'burn-in', to allow the population to reach demographic and genotypic equilibrium. Next, $n_{release}$ males with the genotype _Z\*Z\*aabb_ are added to the population just before fathers are selected, representing the release into the wild of a laboratory-reared strain homozygous for the driving _Z_. In some simulations, all the _Z\*Z\*aabb_ males were released in a single patch, while in others the $n_{release}$ males were randomly and evenly divided across all $k$ patches. The model continued until either A) the driving _Z\*_ allele went extinct, B) the population went extinct, C) the $W^r$ chromosome went to fixation (making population suppression impossible), D) the _Z\*_ allele fixed without causing extinction, or E) 1000 generations had elapsed. The model recorded which of these five outcomes occurred, as well as the allele frequencies, population size, and sex ratio at each generation. 
+
+## Investigating the parameter space
+To investigate the effect of each parameter on the evolutionary outcome, I used Latin hypercube sampling (LHS; implemented via the R package `lhs`), which is an efficient way to select random parameter combinations that are uniformly distributed across a given multidimensional parameter space. I defined this space by choosing a range of biologically relevant values _a priori_, and/or by focusing on convenient values for plotting. For example, I set the range of possible values for $c_f$ at 0-0.6, causing the model to consider _W_-shredders that have no cost to female fecundity (e.g. because all gametes/offspring lost to _W_-shredding are replaced; $c_f \approx 0$), a moderate cost (reflecting incomplete replacement, or costs of the _W_-shredder to survival or fecundity; $c_f \approx 0.1-0.3$), or a _c_. 50% cost (e.g. because all daughters are lost and not replaced). I also selected the maximum value, 0.6, because higher values always resulted in failure to cause extinction (Figure 3). 
+
+After defining the range of values to investigate for each parameter (shown along the $x$-axis of Figure S1), I ran a total of `r n_runs[[1,2]]` simulation runs, yielding the data shown in Figure S1. I then fixed $p_{shred} = 1$ in light of the results shown in Figure S1, and ran a further `r n_runs[[2,2]]` simulations (shown in Figures 3-4). Finally, to investigate the evolution of a female-sterilising gene drive, I $c_f = 1$ and ran a further `r n_runs[[3,2]]` simulations -- most of these simulations allowed all other parameters to vary freely (again, using LHS), while a subset of them had all parameters related to drive resistance set to zero, to give the _Z\*_ allele the best possible chance to cause extinction (which it never managed to do).
+
+\newpage
+# Supplementary tables
+
+**Table S1**: List of the parameter values used to generate the simulation runs shown in Figure 2.
+```{r, results='asis'}
+make_table("../figures/tableS1.rds", math_mode = TRUE)
+```
+
+\newpage
+
+# Supplementary figures
+\beginsupplement
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{../figures/fig_S1_inkscape.pdf}
+\caption{The plot shows the same information as in Figure 3. These data come from an independent set of 1,810,247 simulation runs in which $p_{shred}$ was allowed to vary, in addition to all of the parameters shown in Figure 3. Given the decisive effect of $p_{shred}$ on extinction (top-left panel), I elected to re-run the simulation while fixing $p_{shred} = 1$ (results in Figures 3-4).}
+\end{figure}
+
+
+
+\newpage
+# References

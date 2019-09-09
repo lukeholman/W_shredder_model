@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Making plots and tables from the simulation results</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">myproject</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/lukeholman/W_shredder">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Making plots and tables from the simulation results</h1>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2019-09-09
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>W_shredder/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.3.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20180716code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20180716)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20180716code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20180716)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongNocommitsyet"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> No commits yet </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongNocommitsyet" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    data/
+    Ignored:    output/
+
+Untracked files:
+    Untracked:  .Rprofile
+    Untracked:  .gitignore
+    Untracked:  Proc_B_manuscript/
+    Untracked:  README.md
+    Untracked:  Response to Proc B.docx
+    Untracked:  W_shredder.Rproj
+    Untracked:  _workflowr.yml
+    Untracked:  analysis/
+    Untracked:  code/
+    Untracked:  combine_results_files.R
+    Untracked:  docs/
+    Untracked:  figures/
+    Untracked:  run.R
+    Untracked:  zip_results.sh
+    Untracked:  ~$sponse to Proc B.docx
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="load-packages-and-results" class="section level2">
+<h2>Load packages and results</h2>
+<pre class="r"><code>packages &lt;- c(&quot;dplyr&quot;, &quot;purrr&quot;, &quot;ggplot2&quot;, &quot;reshape2&quot;, &quot;Cairo&quot;, &quot;knitr&quot;, &quot;stringr&quot;,
+              &quot;latex2exp&quot;, &quot;pander&quot;, &quot;grid&quot;, &quot;gridExtra&quot;, &quot;ggthemes&quot;, &quot;data.table&quot;,
+              &quot;readr&quot;, &quot;tibble&quot;, &quot;biglm&quot;, &quot;kableExtra&quot;, &quot;future&quot;, &quot;future.apply&quot;, &quot;parallel&quot;)
+lapply(packages, library, character.only = TRUE, quietly = TRUE)
+
+if(!file.exists(&quot;data/all_results.rds&quot;)){
+  
+  files &lt;- list.files(path = file.path(getwd(), &quot;data&quot;), pattern = &quot;results_&quot;, full.names = TRUE)
+  files &lt;- files[str_detect(files, &quot;results_[:digit:]+.rds&quot;)]
+  n_files &lt;- length(files)
+  
+  # Open all the results files and bind them together into a tibble
+  results &lt;- lapply(1:length(files), 
+                    function(i) {
+                      if(i %% 10 == 0) print(paste(&quot;Doing file&quot;, i, &quot;of&quot;, n_files))
+                      readRDS(files[i]) %&gt;% filter(cost_A == 0 &amp; cost_B == 0)}) %&gt;% 
+    rbindlist() %&gt;% as_tibble()
+  
+  # Make sure each unique parameter space is run exactly once,
+  # unless it was expressly run multiple times using &quot;realisations&quot; (never used in this paper)
+  results &lt;- results %&gt;% 
+    distinct(release_strategy, W_shredding_rate, Z_conversion_rate,
+             Zr_creation_rate, Zr_mutation_rate, Wr_mutation_rate,
+             cost_Zdrive_female, cost_Zdrive_male, male_migration_prob,
+             female_migration_prob, migration_type, n_patches, softness,
+             male_weighting, density_dependence_shape, max_fecundity, realisations,
+             initial_A, initial_B, .keep_all = TRUE)
+  
+  saveRDS(results, file = &quot;data/all_results.rds&quot;)
+} else results &lt;- read_rds(&quot;data/all_results.rds&quot;)
+
+results$went_extinct &lt;- ifelse(results$outcome == &quot;Population extinct&quot;, 1, 0)
+results$migration_type[results$migration_type == &quot;local&quot;] &lt;- &quot;Local&quot;
+results$migration_type[results$migration_type == &quot;global&quot;] &lt;- &quot;Global&quot;
+
+# Command to upload the results file to Spartan - needed for Spartan to queue up all the parameter spaces not already finished
+# scp /Users/lholman/Rprojects/W_shredder/data/all_results.rds lukeholman@spartan:/data/projects/punim0243/W_shredder/data/all_results.rds
+
+# Helper function to get a list of all the model parameters that vary between runs
+find_variable_parameters &lt;- function(dat){
+  dat %&gt;% 
+    select(-id, -realisations, -generation_extinct, -generation_Zd_extinct, 
+           -generation_W_extinct, -generation_Zd_fixed, -outcome, -went_extinct, 
+           -initial_Wr, -initial_Zr) %&gt;%
+    sapply(function(x) length(unique(x))) %&gt;% 
+    keep(~.x &gt; 1) %&gt;% names()
+}
+variable_parameters &lt;- find_variable_parameters(results)
+# combinations &lt;- apply(combn(variable_parameters, 2), 2, paste0, collapse = &quot; x &quot;) # all 2-way combos of parameters
+
+# Make a data frame to convert R-friendly names to figure-friendly names
+nice_names &lt;- data.frame(
+  original = variable_parameters,
+  new = gsub(&quot;_&quot;, &quot; &quot;, variable_parameters),
+  stringsAsFactors = FALSE) %&gt;%
+  mutate(
+    new = gsub(&quot;rel&quot;, &quot;Rel&quot;, new),
+    new = gsub(&quot;W shredding rate&quot;, &quot;Gene drive in females ($p_{shred}$)&quot;, new),
+    new = gsub(&quot;Z conversion rate&quot;, &quot;Gene drive in males ($p_{conv}$)&quot;, new),
+    new = gsub(&quot;Zr creation rate&quot;, &quot;Rate of NHEJ ($p_{nhej}$)&quot;, new),
+    new = gsub(&quot;Zr mutation rate&quot;, &quot;Z-linked resistance ($\\mu{_Z}$)&quot;, new),
+    new = gsub(&quot;Wr mutation rate&quot;, &quot;W-linked resistance ($\\mu{_W}$)&quot;, new),
+    new = gsub(&quot;cost Zdrive female&quot;, &quot;Cost of Z* to females ($c_f$)&quot;, new),
+    new = gsub(&quot;cost Zdrive male&quot;, &quot;Cost of Z* to males ($c_m$)&quot;, new),
+    new = gsub(&quot;male migration prob&quot;, &quot;Male dispersal frequency&quot;, new),
+    new = gsub(&quot;feMale dispersal frequency&quot;, &quot;Female dispersal frequency (xf)&quot;, new),
+    new = gsub(&quot;Male dispersal frequency&quot;, &quot;Male dispersal frequency (xm)&quot;, new),
+    new = gsub(&quot;xm&quot;, &quot;$x_m$&quot;, new), 
+    new = gsub(&quot;xf&quot;, &quot;$x_f$&quot;, new),
+    new = gsub(&quot;migration type&quot;, &quot;Dispersal type&quot;, new),
+    new = gsub(&quot;n patches&quot;, &quot;Number of patches ($k$)&quot;, new),
+    new = gsub(&quot;softness&quot;, &quot;Importance of local density ($\\psi$)&quot;, new),
+    new = gsub(&quot;male weighting&quot;, &quot;Male effect on density ($\\delta$)&quot;, new),
+    new = gsub(&quot;density dependence shape&quot;, &quot;Shape of density dependence ($\\alpha$)&quot;, new),
+    new = gsub(&quot;max fecundity&quot;, &quot;Maximum fecundity ($r$)&quot;, new),
+    new = gsub(&quot;initial A&quot;, &quot;Initial freq. W-shredding resistance allele A&quot;, new),
+    new = gsub(&quot;initial B&quot;, &quot;Initial freq. gene conversion resistance allele B&quot;, new),
+    new = as.character(TeX(new))) %&gt;% 
+  mutate(new = gsub(&quot;mu&quot;, &quot;\\mu&quot;, new))
+
+# Split the results by the type of gene drive:
+
+# A W-shredder with imperfect shredding (for supplement)
+W_shredder &lt;- results %&gt;% filter(cost_Zdrive_female != 1)
+
+# A W-shredder with perfect shredding (main figures)
+perfect_W_shredder &lt;- results %&gt;% filter(cost_Zdrive_female != 1 &amp; W_shredding_rate == 1 &amp; Zr_creation_rate != 0)
+
+# A female-sterilising gene drive (not plotted, none of these runs show extinction, even for parameter space 4 where I tried to help extinciton to happen)
+female_sterilising &lt;- results %&gt;% filter(cost_Zdrive_female == 1)
+
+# Function to format numbers nicely
+pretty &lt;- function(x) prettyNum(x, big.mark = &quot;,&quot;, scientific = FALSE)
+
+rm(results)</code></pre>
+</div>
+<div id="number-of-simulation-runs" class="section level2">
+<h2>Number of simulation runs</h2>
+<p>I essentially ran the simulation until the figures ceased to look any different when I added extra random parameter spaces (generated by Latin hypercube sampling). The following shows the number of simualtion runs for a</p>
+<pre class="r"><code>n_runs &lt;- tibble(
+  `Type of run` = c(&quot;W-shredder with p-shred in the range 0-1&quot;,
+                    &quot;W-shredder with p-shred = 1&quot;,
+                    &quot;Female-sterilising gene drive with c_f = 1&quot;),
+  `Number of parameter spaces sampled` = pretty(c(nrow(W_shredder),
+                                           nrow(perfect_W_shredder),
+                                           nrow(female_sterilising)))
+)
+
+saveRDS(n_runs, file = &quot;data/number_of_runs.rds&quot;)
+
+n_runs %&gt;% kable() %&gt;% kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Type of run
+</th>
+<th style="text-align:left;">
+Number of parameter spaces sampled
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+W-shredder with p-shred in the range 0-1
+</td>
+<td style="text-align:left;">
+1,810,247
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+W-shredder with p-shred = 1
+</td>
+<td style="text-align:left;">
+721,587
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female-sterilising gene drive with c_f = 1
+</td>
+<td style="text-align:left;">
+1,559,817
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="make-figure-2-three-individual-runs" class="section level2">
+<h2>Make Figure 2: three individual runs</h2>
+<div id="make-the-figure" class="section level3">
+<h3>Make the figure</h3>
+<pre class="r"><code>ids &lt;- c(&quot;10021351271896&quot;, &quot;10158427238012&quot;, &quot;10003485256727&quot;)   # 10258132461533
+
+plot_run &lt;- function(){
+  
+  get_data &lt;- function(model_id, allele_freqs_list, result_df, label){
+    
+    df &lt;- pluck_allele_freqs(model_id, allele_freqs_list) 
+    
+    alleles_to_plot &lt;- group_by(df, allele) %&gt;% 
+      summarise(uniques = length(unique(frequency))) %&gt;% 
+      filter(uniques &gt; 1) %&gt;% # Don&#39;t plot alleles that stay at 0 whole time
+      pull(allele)
+    
+    alleles_to_plot &lt;- c(alleles_to_plot, &quot;N&quot;)
+    df &lt;- df[df$allele %in% alleles_to_plot, ]
+    df$frequency[df$allele == &quot;N&quot;] &lt;- df$frequency[df$allele == &quot;N&quot;] /
+      max(df$frequency[df$allele == &quot;N&quot;])
+    
+    paras &lt;- result_df %&gt;% mutate(id = as.character(id)) %&gt;% filter(id == model_id)
+    last_generation &lt;- tail(df,12) %&gt;% select(allele, frequency)
+    #   print(paras); print(last_generation)
+    
+    df %&gt;% mutate(facet = label,
+                  allele = replace(allele, allele == &quot;Zd&quot;, &quot;Z*&quot;),
+                  allele = replace(allele, allele == &quot;females&quot;, &quot;Females&quot;))
+  }
+  
+  # x &lt;- allele_freqs &lt;- read_rds(&quot;data/results_1.rds&quot;)
+  #  x %&gt;% filter(outcome == &quot;Population extinct&quot; )   
+  #  filter(x, outcome == &quot;Zd fixed without extinction&quot; &amp; initial_A == 0 &amp; initial_B == 0)$id
+  allele_freqs &lt;- read_rds(&quot;data/allele_freqs_1.rds&quot;)
+  
+  data1 &lt;- get_data(ids[1], allele_freqs, W_shredder, &quot;A. Z* invades, causing extinction&quot;) %&gt;% 
+    filter(generation &gt;= 45)
+  data1 &lt;- data1 %&gt;%
+    rbind(data.frame(generation = max(data1$generation)+1, allele = &quot;N&quot;, 
+                     frequency = 0, facet = &quot;A. Z* invades, causing extinction&quot;))
+  
+  data2 &lt;- get_data(ids[2], allele_freqs, W_shredder, &quot;B. Z* invades but fails to cause extinction&quot;) %&gt;% 
+    filter(generation &gt;= 35)
+  data3 &lt;- get_data(ids[3], allele_freqs, W_shredder, &quot;C. Resistance to Z* prevents extinction&quot;)
+  
+  # Pantone colours:
+  Marina &lt;- &quot;#4F84C4&quot;
+  Navy &lt;- &quot;#223A5E&quot;
+  Grenadine &lt;- &quot;#DA413D&quot;
+  Primrose &lt;- &quot;#EED4D9&quot;
+  Lilac &lt;- &quot;#774D8E&quot;
+  Bluebell &lt;- &quot;#93B4D7&quot;
+  cols &lt;- c(Navy, Primrose, Grenadine, Marina, Lilac, &quot;#CDA323&quot;, Bluebell)
+  
+  rbind(data1, data2, data3) %&gt;%
+    ggplot(aes(x = generation, y = frequency, colour = allele, group = allele)) + 
+    geom_vline(xintercept = 50, linetype = 3, colour = &quot;grey15&quot;, size = 0.9) + 
+    geom_line(size = 0.9, alpha = 0.9) + 
+    facet_wrap(~facet, scales = &quot;free_x&quot;) +
+    theme_hc() + 
+    scale_colour_manual(values = cols, name = &quot;&quot;) +
+    theme(strip.text = element_text(hjust = 0), 
+          strip.background = element_rect(fill = &quot;grey90&quot;),
+          legend.position = &quot;top&quot;,
+          axis.ticks.y = element_blank()) + 
+    xlab(&quot;Generation&quot;) + ylab(&quot;Frequency&quot;)
+}
+
+fig2 &lt;- plot_run()</code></pre>
+<pre class="r"><code>fig2</code></pre>
+<p><img src="figure/plot_model.Rmd/unnamed-chunk-1-1.png" width="960" style="display: block; margin: auto;" /> <br></br> <strong>Figure 2</strong>: Three illustrative runs of the simulation, showing evolution in response to the release of males carrying a <em>W</em>-shredder at Generation 50 (dotted line). In panel A, the driving <span class="math inline">\(Z^*\)</span> allele fixed very quickly, causing population extinction through a shortage of females. In panel B, the <span class="math inline">\(Z^*\)</span> allele fixed but did not cause extinction, because carrier females continued to produce some daughters due to incomplete <em>W</em>-shredding. In panel C, the <span class="math inline">\(Z^*\)</span> allele invaded, which selected for the <em>W</em>-shredding resistance allele <em>A</em>, causing <span class="math inline">\(Z^*\)</span> to go extinct by removing its transmission advantage. The population size  is shown as a fraction of its maximum value of 10,000. Table S1 lists the parameter spaces used for these three runs.</p>
+</div>
+<div id="make-the-accompanying-table" class="section level3">
+<h3>Make the accompanying table</h3>
+<pre class="r"><code>table_S1 &lt;- t(rbind(
+  data.frame(Panel = &quot;A&quot;, W_shredder %&gt;% filter(id == ids[1])),
+  data.frame(Panel = &quot;B&quot;, W_shredder %&gt;% filter(id == ids[2])),
+  data.frame(Panel = &quot;C&quot;, W_shredder %&gt;% filter(id == ids[3]))) %&gt;%
+  select(release_strategy, W_shredding_rate, 
+         Z_conversion_rate, Zr_creation_rate, Zr_mutation_rate,
+         Wr_mutation_rate, cost_Zdrive_female, cost_Zdrive_male,
+         male_migration_prob, female_migration_prob,
+         migration_type, n_patches, softness, male_weighting,
+         density_dependence_shape, max_fecundity, initial_A, initial_B))
+
+nice_names2 &lt;- data.frame(original = variable_parameters,
+                          new = gsub(&quot;_&quot;, &quot; &quot;, variable_parameters),
+                          stringsAsFactors = FALSE) %&gt;%
+  mutate(
+    new = gsub(&quot;rel&quot;, &quot;Rel&quot;, new),
+    new = gsub(&quot;W shredding rate&quot;, &quot;Gene drive in females (p_shred)&quot;, new),
+    new = gsub(&quot;Z conversion rate&quot;, &quot;Gene drive in males (p_conv)&quot;, new),
+    new = gsub(&quot;Zr creation rate&quot;, &quot;Rate of NHEJ (p_nhej)&quot;, new),
+    new = gsub(&quot;Zr mutation rate&quot;, &quot;Z-linked resistance (μ_Z)&quot;, new),
+    new = gsub(&quot;Wr mutation rate&quot;, &quot;W-linked resistance (μ_W)&quot;, new),
+    new = gsub(&quot;cost Zdrive female&quot;, &quot;Cost of Z* to females (c_f)&quot;, new),
+    new = gsub(&quot;cost Zdrive male&quot;, &quot;Cost of Z* to males (c_m)&quot;, new),
+    new = gsub(&quot;male migration prob&quot;, &quot;Male dispersal frequency&quot;, new),
+    new = gsub(&quot;feMale dispersal frequency&quot;, &quot;Female dispersal frequency (x_f)&quot;, new),
+    new = gsub(&quot;Male dispersal frequency&quot;, &quot;Male dispersal frequency (x_m)&quot;, new),
+    new = gsub(&quot;migration type&quot;, &quot;Dispersal type&quot;, new),
+    new = gsub(&quot;n patches&quot;, &quot;Number of patches (k)&quot;, new),
+    new = gsub(&quot;softness&quot;, &quot;Importance of local density (ψ)&quot;, new),
+    new = gsub(&quot;male weighting&quot;, &quot;Male effect on density (𝛿)&quot;, new),
+    new = gsub(&quot;density dependence shape&quot;, &quot;Shape of density dependence (α)&quot;, new),
+    new = gsub(&quot;max fecundity&quot;, &quot;Maximum fecundity (r)&quot;, new),
+    new = gsub(&quot;initial A&quot;, &quot;Intial freq. W-shredding resistance allele A&quot;, new),
+    new = gsub(&quot;initial B&quot;, &quot;Intial freq. gene conversion resistance allele B&quot;, new)) 
+
+rownames(table_S1) &lt;- nice_names2$new[match(rownames(table_S1), nice_names2$original)]
+rownames(table_S1) &lt;- gsub(&quot;[.]&quot;, &quot;&quot;, rownames(table_S1))
+colnames(table_S1) &lt;- c(&quot;Panel A&quot;, &quot;Panel B&quot;, &quot;Panel C&quot;)
+table_S1[table_S1 == &quot;one_patch&quot;] &lt;- &quot;All in one patch&quot;
+table_S1[table_S1 == &quot;all_patches&quot;] &lt;- &quot;Scattered over all patches&quot;
+table_S1 &lt;- as.data.frame(table_S1, stringsAsFactors = FALSE)
+
+for(i in 1:nrow(table_S1)){
+  if(!(table_S1[i, 1] %in% c(&quot;Local&quot;, &quot;Scattered over all patches&quot;))){
+      table_S1[i, ] &lt;- format(round(as.numeric(table_S1[i, ]), 2), nsmall = 2)
+      if(max(as.numeric(table_S1[i, ])) &gt; 5) table_S1[i, ] &lt;- format(round(as.numeric(table_S1[i, ])), nsmall = 0)
+}}</code></pre>
+<p><strong>Table S1</strong>: List of the parameter values used to generate the simulation runs shown in Figure 2. <br></br></p>
+<pre class="r"><code>table_S1 %&gt;% kable(format = &quot;html&quot;, escape = FALSE, digits=2) %&gt;% kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Panel A
+</th>
+<th style="text-align:left;">
+Panel B
+</th>
+<th style="text-align:left;">
+Panel C
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Release strategy
+</td>
+<td style="text-align:left;">
+Scattered over all patches
+</td>
+<td style="text-align:left;">
+All in one patch
+</td>
+<td style="text-align:left;">
+All in one patch
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Gene drive in females (p_shred)
+</td>
+<td style="text-align:left;">
+0.99
+</td>
+<td style="text-align:left;">
+0.84
+</td>
+<td style="text-align:left;">
+0.84
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Gene drive in males (p_conv)
+</td>
+<td style="text-align:left;">
+0.74
+</td>
+<td style="text-align:left;">
+0.38
+</td>
+<td style="text-align:left;">
+0.54
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rate of NHEJ (p_nhej)
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Z-linked resistance (μ_Z)
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+W-linked resistance (μ_W)
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cost of Z* to females (c_f)
+</td>
+<td style="text-align:left;">
+0.25
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cost of Z* to males (c_m)
+</td>
+<td style="text-align:left;">
+0.10
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.40
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male dispersal frequency (x_m)
+</td>
+<td style="text-align:left;">
+0.23
+</td>
+<td style="text-align:left;">
+0.46
+</td>
+<td style="text-align:left;">
+0.38
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female dispersal frequency (x_f)
+</td>
+<td style="text-align:left;">
+0.50
+</td>
+<td style="text-align:left;">
+0.34
+</td>
+<td style="text-align:left;">
+0.26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dispersal type
+</td>
+<td style="text-align:left;">
+Local
+</td>
+<td style="text-align:left;">
+Global
+</td>
+<td style="text-align:left;">
+Global
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of patches (k)
+</td>
+<td style="text-align:left;">
+15
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Importance of local density (ψ)
+</td>
+<td style="text-align:left;">
+0.65
+</td>
+<td style="text-align:left;">
+0.37
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male effect on density (𝛿)
+</td>
+<td style="text-align:left;">
+1.78
+</td>
+<td style="text-align:left;">
+0.99
+</td>
+<td style="text-align:left;">
+0.20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Shape of density dependence (α)
+</td>
+<td style="text-align:left;">
+1.27
+</td>
+<td style="text-align:left;">
+1.25
+</td>
+<td style="text-align:left;">
+1.60
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Maximum fecundity (r)
+</td>
+<td style="text-align:left;">
+697
+</td>
+<td style="text-align:left;">
+788
+</td>
+<td style="text-align:left;">
+188
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Intial freq W-shredding resistance allele A
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Intial freq gene conversion resistance allele B
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="make-figures-3-4-and-s1-effect-of-each-parameter" class="section level2">
+<h2>Make Figures 3-4 and S1: effect of each parameter</h2>
+<pre class="r"><code>find_percent_extinct &lt;- function(variable, dataset, number_of_bins){
+  
+  dataset &lt;- dataset %&gt;% rename(value = !! variable)
+  if(is.numeric(dataset$value) &amp; length(unique(dataset$value)) &gt; 5){
+    dataset &lt;- dataset %&gt;% 
+      mutate(value_bin = cut(value, number_of_bins),
+             value = (gsub(&quot;]&quot;, &quot;&quot;, gsub(&quot;[(]&quot;, &quot;&quot;, value_bin))),
+             value = map_dbl(strsplit(value, split = &quot;,&quot;), ~ mean(as.numeric(.x)))) %&gt;%
+      group_by(value, value_bin) 
+  } else {
+    dataset &lt;- dataset %&gt;% group_by(value) 
+  }
+  
+  output &lt;- dataset %&gt;%
+    summarise(n_extinct = sum(went_extinct == 1),
+              n_runs = n(),
+              percent_extinct = 100 * n_extinct / n_runs,
+              mean_extinction_time = mean(generation_extinct, na.rm = TRUE)) %&gt;%
+    mutate(parameter = variable,
+           mean_extinction_time = replace(mean_extinction_time, is.nan(mean_extinction_time), NA))
+  
+  if(nrow(output) &lt; 5) output$value &lt;- as.character(output$value)
+  output
+}
+
+make_one_plot &lt;- function(dataset, response){
+  
+  dataset$y &lt;- dataset %&gt;% pull(which(names(dataset) == response))
+  dataset$parameter &lt;- nice_names$new[nice_names$original == dataset$parameter[1]]
+
+  
+  if(nrow(dataset) != 2){
+    p &lt;- ggplot(dataset, aes(value, y)) +
+      geom_point(alpha = 0.6, colour = &quot;#263056&quot;)
+  } else {
+    p &lt;- ggplot(dataset, aes(value, y)) +
+      geom_bar(stat = &quot;identity&quot;, fill = &quot;#ff6f61&quot;, width = 0.7, colour = &quot;grey18&quot;)
+  }
+  
+  if(dataset$parameter[1] %in% c(&quot;male_weighting&quot;, &quot;density_dependence_shape&quot;)){
+    p &lt;- p + geom_vline(xintercept = 1, linetype = 2, colour = &quot;grey18&quot;)
+  }
+  
+  p + 
+    stat_smooth(method = &quot;loess&quot;, se = FALSE, colour = &quot;#00a9e0&quot;) +
+    labs(y = NULL, x = NULL) + 
+    facet_wrap(~ parameter, labeller = label_parsed) + 
+    theme_bw() + 
+    theme(strip.background = element_rect(fill = &quot;#fbd872&quot;))
+}
+
+make_multiplot_data &lt;- function(dat, cores){
+  dat &lt;- mclapply(variable_parameters, find_percent_extinct, dataset = dat, number_of_bins = 51, mc.cores = cores)
+  out_list &lt;- dat[order(sapply(dat, function(x) max(x$percent_extinct)), decreasing = TRUE)]
+  keep &lt;- which(sapply(out_list, nrow) &gt; 1)
+  out_list[keep]
+}
+
+make_multiplot &lt;- function(multiplot_data, response){  
+  
+  left_axis_label &lt;- ifelse(response == &quot;percent_extinct&quot;, &quot;% runs ending in extinction&quot;, &quot;Mean generations until extinction&quot;)
+  
+  multiplot_data %&gt;%
+    map(~ make_one_plot(.x, response = response)) %&gt;%
+    grid.arrange(grobs = ., left = left_axis_label, bottom = &quot;Parameter value&quot;)
+}
+
+if(!file.exists(&quot;figures/fig_S1.rds&quot;)){
+  fig34_data &lt;- make_multiplot_data(perfect_W_shredder, cores = 4)
+  figS1_data &lt;- make_multiplot_data(W_shredder, cores = 4)
+
+  fig_3 &lt;- make_multiplot(fig34_data, &quot;percent_extinct&quot;)
+  fig_4 &lt;- make_multiplot(fig34_data, &quot;mean_extinction_time&quot;)
+  fig_S1 &lt;- make_multiplot(figS1_data, &quot;percent_extinct&quot;)
+
+  fig_3 %&gt;%  saveRDS(file = &quot;figures/fig_3.rds&quot;)
+  fig_4 %&gt;%  saveRDS(file = &quot;figures/fig_4.rds&quot;)
+  fig_S1 %&gt;% saveRDS(file = &quot;figures/fig_S1.rds&quot;)
+  fig_3 %&gt;% ggsave(filename = &quot;figures/fig_3.pdf&quot;, width = 9, height = 10)
+  fig_4 %&gt;% ggsave(filename = &quot;figures/fig_4.pdf&quot;, width = 9, height = 10)
+  fig_S1 %&gt;% ggsave(filename = &quot;figures/fig_S1.pdf&quot;, width = 9, height = 10)
+
+} else {
+  fig_3 &lt;- readRDS(&quot;figures/fig_3.rds&quot;)
+  fig_4 &lt;- readRDS(&quot;figures/fig_4.rds&quot;)
+  fig_S1 &lt;- readRDS(&quot;figures/fig_S1.rds&quot;)
+}</code></pre>
+<pre class="r"><code>grid.newpage()
+grid.draw(fig_3)</code></pre>
+<p><img src="figure/plot_model.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /> <br></br> <strong>Figure 3</strong>: The plot shows the effect of each model parameter on the percentage of simulation runs in which the population went extinct, for simulations of a <em>Z</em>-linked <em>W</em>-shredder that completely prevents the production of daughters by females (<span class="math inline">\(p_{shred} = 1\)</span>). The plot was generated by sampling evenly from the complete parameter space 721,587 times using Latin hypercube sampling, such that each plot shows the marginal effect of one parameter while the other parameters vary independently across their possible ranges (shown by the relevant <span class="math inline">\(x\)</span>-axis scale). Continuous parameters were grouped into 51 bins (each containing approximately 14,400 runs, i.e. ~2% of the total), and the lines were fitted using LOESS (locally estimated scatterplot smoothing). Note that the <span class="math inline">\(y\)</span>-axis scales to the range of the data, and the panels are ordered by this range (showing the approximate relative importance of each parameter).</p>
+<pre class="r"><code>grid.newpage()
+grid.draw(fig_4)</code></pre>
+<p><img src="figure/plot_model.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /> <br></br> <strong>Figure 4</strong>: The plot shows the average number of generations until extinction, among the subset of runs in which extinction occurred. The density plot in the lower right shows the distribution of the response variable across all the parameter spaces in which the <em>Z*</em> allele was costly (defined as <span class="math inline">\(c_f &gt; 0.05\)</span> and/or <span class="math inline">\(c_m &gt; 0.05\)</span>) or not costly (<span class="math inline">\(c_f &lt; 0.05\)</span> and <span class="math inline">\(c_m &lt; 0.05\)</span>), and in which the <em>Z*</em> allele benefitted from strong gene drive in males (dp_{conv} &gt; 0.95<span class="math inline">\() or not (\)</span>p_{conv} &lt; 0.95$). Other details are the same as for Figure 3.</p>
+<pre class="r"><code>grid.newpage()
+grid.draw(fig_S1)</code></pre>
+<p><img src="figure/plot_model.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /> <br></br> <strong>Figure S1</strong>: The plot shows the same information as in Figure 3. These data come from an independent set of 1,810,247 simulation runs in which <span class="math inline">\(p_{shred}\)</span> was allowed to vary, in addition to all of the parameters shown in Figure 3.</p>
+<div id="make-inset-of-figure-4---time-to-extinction-frequency-distribution" class="section level3">
+<h3>Make inset of Figure 4 - time to extinction frequency distribution</h3>
+<pre class="r"><code>median_gen &lt;- perfect_W_shredder$generation_extinct %&gt;% median(na.rm = T)
+median_gen_no_cost &lt;- perfect_W_shredder %&gt;% filter(cost_Zdrive_female &lt; 0.05 &amp; cost_Zdrive_male &lt; 0.05) %&gt;%
+  pull(generation_extinct) %&gt;% median(na.rm=T)
+
+annot &lt;- data.frame(x = 51, y = 1.16, text = paste(&quot;Median:&quot;, median_gen))
+
+inset &lt;- perfect_W_shredder %&gt;%
+  mutate(no_cost = ifelse((cost_Zdrive_female &gt; 0.05 | cost_Zdrive_male &gt; 0.05) &amp; Z_conversion_rate &lt; 0.05, &quot;No male drive, costly&quot;, NA)) %&gt;%
+  mutate(no_cost = replace(no_cost, (cost_Zdrive_female &gt; 0.05 | cost_Zdrive_male &gt; 0.05) &amp;  Z_conversion_rate &gt; 0.95, &quot;Male drive, costly&quot;)) %&gt;%
+  mutate(no_cost = replace(no_cost, cost_Zdrive_female &lt; 0.05 &amp; cost_Zdrive_male &lt; 0.05 &amp; Z_conversion_rate &lt; 0.05, &quot;No male drive, not costly&quot;)) %&gt;%
+  mutate(no_cost = replace(no_cost, cost_Zdrive_female &lt; 0.05 &amp; cost_Zdrive_male &lt; 0.05 &amp; Z_conversion_rate &gt; 0.95, &quot;Male drive, not costly&quot;)) %&gt;%
+  filter(!is.na(no_cost) &amp; !is.na(generation_extinct)) %&gt;%
+  mutate(no_cost = factor(no_cost, rev(c(&quot;No male drive, costly&quot;, &quot;No male drive, not costly&quot;, &quot;Male drive, costly&quot;, &quot;Male drive, not costly&quot;)))) %&gt;%
+  ggplot(aes(generation_extinct, fill = no_cost)) +
+  scale_x_log10(breaks = c(10,20,30,40,50,100,200,300,400,500,1000)) + 
+  geom_density(alpha = 0.5) + 
+  scale_fill_brewer(name = &quot;Gene drive type&quot;, palette = &quot;Set3&quot;) +
+  annotation_logticks(sides=&quot;b&quot;) + 
+  ylab(&quot;Density&quot;) + xlab(&quot;Generation in which extinction occurred&quot;) +
+  theme_bw() + 
+  theme(legend.position = c(0.8, 0.8))
+
+inset %&gt;% ggsave(filename = &quot;figures/fig_4_inset.pdf&quot;, width = 4, height = 1.8)</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.5.1 (2018-07-02)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS High Sierra 10.13.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_AU.UTF-8/en_AU.UTF-8/en_AU.UTF-8/C/en_AU.UTF-8/en_AU.UTF-8
+
+attached base packages:
+[1] grid      parallel  stats     graphics  grDevices utils     datasets 
+[8] methods   base     
+
+other attached packages:
+ [1] future.apply_1.3.0 future_1.14.0      kableExtra_0.9.0  
+ [4] biglm_0.9-1        DBI_1.0.0          data.table_1.12.2 
+ [7] ggthemes_4.0.1     gridExtra_2.3      pander_0.6.2      
+[10] latex2exp_0.4.0    knitr_1.23         Cairo_1.5-9       
+[13] ggplot2_3.1.0      tibble_2.0.99.9000 readr_1.1.1       
+[16] rslurm_0.4.0       Rcpp_1.0.2         lhs_1.0.1         
+[19] reshape2_1.4.3     stringr_1.4.0      tidyr_0.8.2       
+[22] purrr_0.3.2        dplyr_0.8.3       
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_0.2.5   xfun_0.8           listenv_0.7.0     
+ [4] colorspace_1.3-2   htmltools_0.3.6    viridisLite_0.3.0 
+ [7] yaml_2.2.0         rlang_0.4.0        pillar_1.3.1.9000 
+[10] glue_1.3.1.9000    withr_2.1.2        RColorBrewer_1.1-2
+[13] plyr_1.8.4         munsell_0.5.0      gtable_0.2.0      
+[16] workflowr_1.3.0    rvest_0.3.2        codetools_0.2-15  
+[19] evaluate_0.14      labeling_0.3       highr_0.8         
+[22] scales_1.0.0       backports_1.1.2    fs_1.3.1          
+[25] hms_0.4.2          digest_0.6.20      stringi_1.4.3     
+[28] rprojroot_1.3-2    tools_3.5.1        magrittr_1.5      
+[31] lazyeval_0.2.2     crayon_1.3.4       pkgconfig_2.0.2   
+[34] xml2_1.2.0         assertthat_0.2.1   rmarkdown_1.13    
+[37] httr_1.4.0         rstudioapi_0.10    R6_2.4.0          
+[40] globals_0.12.4     git2r_0.23.0       compiler_3.5.1    </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

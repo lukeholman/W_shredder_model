@@ -1,0 +1,19 @@
+---
+title: "Evolutionary simulations of _Z_-linked suppression gene drives"
+site: workflowr::wflow_site
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+This website presents all the code used for the forthcoming paper "Evolutionary simulations of _Z_-linked suppression gene drives" by Luke Holman. 
+
+
+# Custom functions used in the simulation
+Click [here](model_functions.html) to see all functions used in the simulation.
+
+# Running the simulation
+Click [here](run_model.html) to see how the simulation was run on the University of Melbourne supercomputer, Spartan.
+
+# Analysing and plotting the results
+Click [here](plot_model.html) to see the figures and tables generated from the simulation output data.
