@@ -6,7 +6,7 @@ output:
     toc: false
 ---
 
-This website presents all the code used for the forthcoming paper "Evolutionary simulations of _Z_-linked suppression gene drives" by Luke Holman. 
+This website presents all the code used for the forthcoming paper "Evolutionary simulations of _Z_-linked suppression gene drives" by Luke Holman.  
 
 
 # Custom functions used in the simulation
