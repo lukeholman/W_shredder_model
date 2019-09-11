@@ -343,7 +343,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-09-09
+<strong>Last updated:</strong> 2019-09-11
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -434,10 +434,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomlukeholmanWshreddermodeltree12cf147ae9b185a1101fc2baaa4bea5afe5f8346targetblank12cf147a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/lukeholman/W_shredder_model/tree/12cf147ae9b185a1101fc2baaa4bea5afe5f8346" target="_blank">12cf147</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomlukeholmanWshreddermodeltree3ee434a283bcbfa558467153e71874d2a51b0846targetblank3ee434aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/lukeholman/W_shredder_model/tree/3ee434a283bcbfa558467153e71874d2a51b0846" target="_blank">3ee434a</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomlukeholmanWshreddermodeltree12cf147ae9b185a1101fc2baaa4bea5afe5f8346targetblank12cf147a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomlukeholmanWshreddermodeltree3ee434a283bcbfa558467153e71874d2a51b0846targetblank3ee434aa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -448,6 +448,7 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    Proc_B_manuscript/.DS_Store
+    Ignored:    analysis/figure/
     Ignored:    code/.DS_Store
     Ignored:    data/
     Ignored:    figures/.DS_Store
@@ -455,9 +456,6 @@ Ignored files:
 
 Untracked files:
     Untracked:  .gitignore
-
-Unstaged changes:
-    Modified:   figures/fig_4_inset.pdf
 
 </code></pre>
 <p>
@@ -496,6 +494,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/lukeholman/W_shredder_model/40ce7d23ebc80d20a7b9a92dfa26ffda9273ba37/docs/model_functions.html" target="_blank">40ce7d2</a>
+</td>
+<td>
+lukeholman
+</td>
+<td>
+2019-09-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -1393,7 +1408,7 @@ pick_fathers &lt;- function(parent_list){
 </div>
 <div id="function-to-set-up-several-mating-type-tables" class="section level2">
 <h2>Function to set up several mating type tables</h2>
-<p>If running the simulation on many parameter spaces, we will first need to set up several mating_type_tables, each of which takes several seconds of compute time. To speed this up, this function identifies all the unique mating_type_tables that are implied by the table <code>parameters</code>, and generates them all in parallel using mclapply().</p>
+<p>If running the simulation on many parameter spaces, we will first need to set up several mating_type_tables, each of which takes several seconds of compute time. To speed this up, this function identifies all the unique mating_type_tables that are implied by the table <code>parameters</code>, and generates them all in parallel using <code>mclapply()</code>.</p>
 <pre class="r"><code>set_up_mating_type_tables &lt;- function(parameters, 
                                       cores, 
                                       wd,
@@ -1436,7 +1451,7 @@ pick_fathers &lt;- function(parent_list){
   uniques &lt;- unique(parameters$mating_table)
   
   # I added this section to fix a &quot;bug&quot;, but I think it was just an issue with the Spartan server because the bug mysteriously fixed itself!! 
-  # I think this code is never actually triggered now
+  # My tests suggest this if() statement is never actually triggered now
 
   files &lt;- paste(path_to_tables, uniques, &quot;.rds&quot;, sep = &quot;&quot;)
   mating_tables &lt;- vector(length(files), mode = &quot;list&quot;)
@@ -1475,19 +1490,15 @@ pick_fathers &lt;- function(parent_list){
 </div>
 <div id="function-to-run-the-simulation" class="section level2">
 <h2>Function to run the simulation</h2>
-<p>This function runs the simulation, for a single parameter space specified by <code>parameters[row, ]</code>, using a pre-made mating_type_table.</p>
+<p>This function runs the simulation, for a single parameter space specified by <code>parameters[row, ]</code>.</p>
 <pre class="r"><code>run_simulation &lt;- function(row,
                            parameters,
-                           # mating_type_table,
                            wd){
   
   output.file &lt;- sample(99999999999999, 1) # each parameter space gets a unique ID number
   set.seed(as.integer(substr(output.file, 1, 5))) # Note that the file name is also the seed
   output.file &lt;- paste(file.path(wd, &quot;data/sim_results/&quot;),
                        output.file, &quot;.rds&quot;, sep = &quot;&quot;)
-  
-  # Keep only the correct mating table from the list of tables made by set_up_mating_type_tables()
-  # mating_type_table &lt;- mating_type_table[[parameters$mating_table[row]]]
   
   # Create the mating type table for this run (takes about 100 seconds)
   mating_type_table &lt;- make_mating_type_table(
@@ -1538,7 +1549,7 @@ pick_fathers &lt;- function(parent_list){
   generation_extinct &lt;- NA # Declare outputs
   generation_Zd_extinct &lt;- NA
   generation_W_extinct &lt;- NA # wild-type W, aka W+
-  generation_Zd_fixed &lt;- NA #If shredding rate is less than 100%, pop can sometimes persist with the Z*
+  generation_Zd_fixed &lt;- NA # If shredding rate is less than 100%, pop can sometimes persist with the Z*
   outcome &lt;- &quot;Timer expired&quot; 
   final_pop &lt;- &quot;placeholder&quot;
   
@@ -1693,23 +1704,15 @@ pick_fathers &lt;- function(parent_list){
   
   if(!is.null(wd)) setwd(wd)
   else wd &lt;- getwd()
-  
-  # mating_type_tables &lt;- set_up_mating_type_tables(
-  #   parameters, cores = cores, 
-  #   overwrite = FALSE, # Change this manually if needed
-  #   wd = wd) 
-  # parameters &lt;- mating_type_tables[[1]] # annotate the parameters with the mating tables numbers
-  # mating_type_tables &lt;- mating_type_tables[[2]] # Get the mating tables themselves
-  
-  
-  mclapply(1:nrow(parameters), 
-           function(i){
-             run_simulation(
-               row = i, 
-               parameters = parameters,
-              # mating_type_table = mating_type_tables,
-               wd = wd)
-           }, mc.cores = cores)
+
+  mclapply(
+    1:nrow(parameters), 
+    function(i){
+      run_simulation(
+        row = i, 
+        parameters = parameters,
+        wd = wd)}, 
+    mc.cores = cores)
 }</code></pre>
 </div>
 <div id="combine-all-the-results-files" class="section level2">
