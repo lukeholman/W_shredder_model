@@ -881,7 +881,7 @@ get_allele_freqs <- function(pop, generation){
 ```
 
 ## Function to set up several mating type tables
-If running the simulation on many parameter spaces, we will first need to set up several mating_type_tables, each of which takes several seconds of compute time. To speed this up, this function identifies all the unique mating_type_tables that are implied by the table `parameters`, and generates them all in parallel using mclapply().
+If running the simulation on many parameter spaces, we will first need to set up several mating_type_tables, each of which takes several seconds of compute time. To speed this up, this function identifies all the unique mating_type_tables that are implied by the table `parameters`, and generates them all in parallel using `mclapply()`.
 
 ```{r}
 set_up_mating_type_tables <- function(parameters, 
@@ -926,7 +926,7 @@ set_up_mating_type_tables <- function(parameters,
   uniques <- unique(parameters$mating_table)
   
   # I added this section to fix a "bug", but I think it was just an issue with the Spartan server because the bug mysteriously fixed itself!! 
-  # I think this code is never actually triggered now
+  # My tests suggest this if() statement is never actually triggered now
 
   files <- paste(path_to_tables, uniques, ".rds", sep = "")
   mating_tables <- vector(length(files), mode = "list")
@@ -965,21 +965,17 @@ set_up_mating_type_tables <- function(parameters,
 ```
 
 ## Function to run the simulation
-This function runs the simulation, for a single parameter space specified by `parameters[row, ]`, using a pre-made mating_type_table.
+This function runs the simulation, for a single parameter space specified by `parameters[row, ]`.
 
 ```{r}
 run_simulation <- function(row,
                            parameters,
-                           # mating_type_table,
                            wd){
   
   output.file <- sample(99999999999999, 1) # each parameter space gets a unique ID number
   set.seed(as.integer(substr(output.file, 1, 5))) # Note that the file name is also the seed
   output.file <- paste(file.path(wd, "data/sim_results/"),
                        output.file, ".rds", sep = "")
-  
-  # Keep only the correct mating table from the list of tables made by set_up_mating_type_tables()
-  # mating_type_table <- mating_type_table[[parameters$mating_table[row]]]
   
   # Create the mating type table for this run (takes about 100 seconds)
   mating_type_table <- make_mating_type_table(
@@ -1030,7 +1026,7 @@ run_simulation <- function(row,
   generation_extinct <- NA # Declare outputs
   generation_Zd_extinct <- NA
   generation_W_extinct <- NA # wild-type W, aka W+
-  generation_Zd_fixed <- NA #If shredding rate is less than 100%, pop can sometimes persist with the Z*
+  generation_Zd_fixed <- NA # If shredding rate is less than 100%, pop can sometimes persist with the Z*
   outcome <- "Timer expired" 
   final_pop <- "placeholder"
   
@@ -1187,23 +1183,15 @@ do_all_parameters <- function(parameters, over_write, cores, wd = NULL){
   
   if(!is.null(wd)) setwd(wd)
   else wd <- getwd()
-  
-  # mating_type_tables <- set_up_mating_type_tables(
-  #   parameters, cores = cores, 
-  #   overwrite = FALSE, # Change this manually if needed
-  #   wd = wd) 
-  # parameters <- mating_type_tables[[1]] # annotate the parameters with the mating tables numbers
-  # mating_type_tables <- mating_type_tables[[2]] # Get the mating tables themselves
-  
-  
-  mclapply(1:nrow(parameters), 
-           function(i){
-             run_simulation(
-               row = i, 
-               parameters = parameters,
-              # mating_type_table = mating_type_tables,
-               wd = wd)
-           }, mc.cores = cores)
+
+  mclapply(
+    1:nrow(parameters), 
+    function(i){
+      run_simulation(
+        row = i, 
+        parameters = parameters,
+        wd = wd)}, 
+    mc.cores = cores)
 }
 ```
 

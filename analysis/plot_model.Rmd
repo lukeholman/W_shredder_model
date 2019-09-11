@@ -22,7 +22,7 @@ source_rmd("analysis/model_functions.Rmd")
 ```{r load_data, results='hide', message=FALSE, warning=FALSE}
 packages <- c("dplyr", "purrr", "ggplot2", "reshape2", "Cairo", "knitr", "stringr",
               "latex2exp", "pander", "grid", "gridExtra", "ggthemes", "data.table",
-              "readr", "tibble", "biglm", "kableExtra", "future", "future.apply", "parallel")
+              "readr", "tibble", "kableExtra", "future", "future.apply", "parallel")
 lapply(packages, library, character.only = TRUE, quietly = TRUE)
 
 if(!file.exists("data/all_results.rds")){
@@ -311,8 +311,8 @@ find_percent_extinct <- function(variable, dataset, number_of_bins){
       group_by(value, value_bin) 
   } else {
     dataset <- dataset %>% group_by(value) 
-  }
-   
+  } 
+  
   output <- dataset %>%
     summarise(n_extinct = sum(went_extinct == 1),
               n_runs = n(),
@@ -401,7 +401,7 @@ grid.newpage()
 grid.draw(fig_4)
 ```
 <br></br>
-**Figure 4**: The plot shows the average number of generations until extinction, among the subset of runs in which extinction occurred. The density plot in the lower right shows the distribution of the response variable across all the parameter spaces in which the _Z\*_ allele was costly (defined as $c_f > 0.05$ and/or $c_m > 0.05$) or not costly ($c_f < 0.05$ and $c_m < 0.05$), and in which the _Z\*_ allele benefitted from strong gene drive in males (dp_{conv} > 0.95$) or not ($p_{conv} < 0.95$). Other details are the same as for Figure 3. 
+**Figure 4**: The plot shows the average number of generations until extinction, among the subset of runs in which extinction occurred. The density plot in the lower right shows the distribution of the response variable across all the parameter spaces in which the _Z\*_ allele was costly (defined as $c_f > 0.05$ and/or $c_m > 0.05$) or not costly ($c_f < 0.05$ and $c_m < 0.05$), and in which the _Z\*_ allele benefitted from strong gene drive in males ($p_{conv} > 0.95$) or not ($p_{conv} < 0.95$). Other details are the same as for Figure 3. 
 
 ```{r fig.height=10, fig_width=14}
 grid.newpage()
@@ -436,5 +436,6 @@ inset <- perfect_W_shredder %>%
   theme(legend.position = c(0.8, 0.8))
 
 inset %>% ggsave(filename = "figures/fig_4_inset.pdf", width = 4, height = 1.8)
+inset
 ```
 
